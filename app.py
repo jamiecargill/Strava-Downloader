@@ -3,19 +3,27 @@ import dotenv
 import json
 from stravaio import strava_oauth2, StravaIO
 
-dotenv.load_dotenv()
+def everything_else(token):
+    client = StravaIO(access_token=token['access_token'])
 
-STRAVA_CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
-STRAVA_CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
+    #athlete = client.get_logged_in_athlete()
 
-token = strava_oauth2(client_id=STRAVA_CLIENT_ID, client_secret=STRAVA_CLIENT_SECRET)
+    activities = client.get_logged_in_athlete_activities(after='last week')
 
-client = StravaIO(access_token=token['access_token'])
+    with open('activities.txt', 'w') as f:
+        for activity in activities:
+            f.write("%s\n" % activity)
 
-athlete = client.get_logged_in_athlete()
+def get_token():
+    STRAVA_CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
+    STRAVA_CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
+    token = strava_oauth2(client_id=STRAVA_CLIENT_ID, client_secret=STRAVA_CLIENT_SECRET)
+    return token
 
-activities = client.get_logged_in_athlete_activities(after='last week')
+def main():
+    dotenv.load_dotenv()
+    token = get_token()
+    print(token)
 
-with open('activities.txt', 'w') as f:
-    for activity in activities:
-        f.write("%s\n" % activity)
+if __name__ == "__main__":
+    main()
