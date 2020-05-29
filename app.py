@@ -1,6 +1,7 @@
 import os
 import dotenv
 import json
+import re
 from stravaio import strava_oauth2, StravaIO
 
 def everything_else(token):
@@ -20,10 +21,27 @@ def get_token():
     token = strava_oauth2(client_id=STRAVA_CLIENT_ID, client_secret=STRAVA_CLIENT_SECRET)
     return token
 
+def setenv(variable, value):
+    with open('.env', 'r') as file:
+        envvars = file.readlines()
+    
+    match = None
+
+    for var in envvars:
+        if re.search(variable + "*", var):
+            match = var
+    
+    envvars.remove(match)
+    envvars.append(variable + '="' + value + '"\n')
+
+    with open('.env', 'w') as file:
+        file.writelines(envvars)
+
 def main():
     dotenv.load_dotenv()
-    token = get_token()
-    print(token)
+    #token = get_token()
+    #print(token)
+    setenv("TEST_VAR","1235")
 
 if __name__ == "__main__":
     main()
