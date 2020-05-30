@@ -16,6 +16,13 @@ def everything_else(token):
             f.write("%s\n" % activity)
 
 def get_token():
+    f = open("token.json", "r")
+    token = f.read()
+    f.close()
+
+    return token
+
+def get_new_token():
     STRAVA_CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
     STRAVA_CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
 
@@ -23,6 +30,8 @@ def get_token():
         return "Client ID or Client Secret Not Present"
 
     token = strava_oauth2(client_id=STRAVA_CLIENT_ID, client_secret=STRAVA_CLIENT_SECRET)
+    token = json.dumps(token)
+
     return token
 
 def setenv(variable, value):
@@ -43,13 +52,13 @@ def setenv(variable, value):
 
 def main():
     dotenv.load_dotenv()
+    #token = get_new_token()
     token = get_token()
 
     if token ==  "Client ID or Client Secret Not Present":
         print("Both STRAVA_CLIENT_ID and STRAVA_CLIENT_SECRET need to be present in .env")
         return
 
-    token = json.dumps(token)
     print(token)
 
 if __name__ == "__main__":
