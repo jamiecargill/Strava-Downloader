@@ -10,10 +10,19 @@ def everything_else(token):
     #athlete = client.get_logged_in_athlete()
 
     activities = client.get_logged_in_athlete_activities(after='last week')
+    print(type(activities))
 
-    with open('activities.txt', 'w') as f:
-        for activity in activities:
-            f.write("%s\n" % activity)
+    activity_dict = {}
+
+    for activity in activities:
+        activity = activity.to_dict()
+        activity_dict[activity["id"]] = activity
+    
+    activity_json = json.dumps(activity_dict, indent=4, sort_keys=True, default=str)
+
+    f = open("activities.json", "w")
+    f.write(activity_json)
+    f.close()
 
 
 def get_token():
@@ -56,7 +65,8 @@ def main():
 
     if token is not None:
         print(token)
-        #everything_else(token)
+        print(type(token))
+        everything_else(token)
         return
 
 
