@@ -10,7 +10,6 @@ def everything_else(token):
     #athlete = client.get_logged_in_athlete()
 
     activities = client.get_logged_in_athlete_activities(after='last week')
-    print(type(activities))
 
     activity_dict = {}
 
@@ -64,8 +63,6 @@ def main():
     token = get_token()
 
     if token is not None:
-        print(token)
-        print(type(token))
         everything_else(token)
         return
 
