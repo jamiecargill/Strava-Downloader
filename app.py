@@ -1,7 +1,6 @@
 import os
 import dotenv
 import json
-import re
 import time
 from stravaio import strava_oauth2, StravaIO
 
@@ -49,23 +48,6 @@ def get_new_token():
     token = json.dumps(token)
 
     return token
-
-
-def setenv(variable, value):
-    with open('.env', 'r') as file:
-        envvars = file.readlines()
-    
-    match = None
-
-    for var in envvars:
-        if re.search(variable + "*", var):
-            match = var
-    
-    envvars.remove(match)
-    envvars.append(variable + '="' + value + '"\n')
-
-    with open('.env', 'w') as file:
-        file.writelines(envvars)
 
 
 def main():
