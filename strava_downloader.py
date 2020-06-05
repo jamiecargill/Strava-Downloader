@@ -4,12 +4,13 @@ import json
 import time
 from stravaio import strava_oauth2, StravaIO
 
-def everything_else(token):
+def everything_else(token, date = None):
     client = StravaIO(access_token=token['access_token'])
 
-    #athlete = client.get_logged_in_athlete()
-
-    activities = client.get_logged_in_athlete_activities(after='last week')
+    if date == None:
+        activities = client.get_logged_in_athlete_activities()
+    else:
+        activities = client.get_logged_in_athlete_activities(after=date)
 
     activity_dict = {}
 
@@ -19,16 +20,16 @@ def everything_else(token):
     
     activity_json = json.dumps(activity_dict, indent=4, sort_keys=True, default=str)
 
-    f = open("activities.json", "w")
-    f.write(activity_json)
-    f.close()
+    file_activities = open("activities.json", "w")
+    file_activities.write(activity_json)
+    file_activities.close()
 
 
 def get_token():
-    f = open("token.json", "r")
-    file_contents = f.read()
+    file_token = open("token.json", "r")
+    file_contents = file_token.read()
     token = json.loads(file_contents)
-    f.close()
+    file_token.close()
 
     currentime = int(time.time())
 
@@ -38,9 +39,9 @@ def get_token():
             print("Both STRAVA_CLIENT_ID and STRAVA_CLIENT_SECRET need to be present in .env")
             return
         else:
-            f = open("token.json", "w")
-            f.write(token)
-            f.close()
+            file_token = open("token.json", "w")
+            file_token.write(token)
+            file_token.close()
     
     return token
 
@@ -63,7 +64,7 @@ def main():
     token = get_token()
 
     if token is not None:
-        everything_else(token)
+        everything_else(token, "2020-05-31")
         return
 
 
