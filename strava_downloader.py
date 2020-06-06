@@ -27,13 +27,9 @@ def get_token():
 
     if currentime > token["expires_at"]:
         token = get_new_token()
-        if token ==  "Client ID or Client Secret Not Present":
-            print("Both STRAVA_CLIENT_ID and STRAVA_CLIENT_SECRET need to be present in .env")
-            return
-        else:
-            file_token = open("token.json", "w")
-            file_token.write(token)
-            file_token.close()
+        file_token = open("token.json", "w")
+        file_token.write(token)
+        file_token.close()
     
     return token
 
@@ -41,9 +37,6 @@ def get_token():
 def get_new_token():
     STRAVA_CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
     STRAVA_CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
-
-    if STRAVA_CLIENT_ID == None or STRAVA_CLIENT_SECRET == None:
-        return "Client ID or Client Secret Not Present"
 
     token = strava_oauth2(client_id=STRAVA_CLIENT_ID, client_secret=STRAVA_CLIENT_SECRET)
     token = json.dumps(token)
@@ -106,8 +99,6 @@ def setup_dotenv():
 def main():
     setup_dotenv()
     dotenv.load_dotenv()
-    STRAVA_CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
-    STRAVA_CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
     #token = get_token()
     #client = StravaIO(access_token=token['access_token'])
     #get_most_recent_local_activity()
