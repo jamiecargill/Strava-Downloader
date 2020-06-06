@@ -5,16 +5,35 @@ import json
 import time
 from stravaio import strava_oauth2, StravaIO
 
-def everything_else(token):
-    client = StravaIO(access_token=token['access_token'])
+def get_all_activities(client):
+    activities = client.get_logged_in_athlete_activities()
 
-    #athlete = client.get_logged_in_athlete()
+    activity_dict = {}
 
-    activities = client.get_logged_in_athlete_activities(after='last week')
+    for activity in activities:
+        activity = activity.to_dict()
+        activity_dict[activity["id"]] = activity
+    
+    activity_json = json.dumps(activity_dict, indent=4, sort_keys=True, default=str)
 
-    with open('activities.txt', 'w') as f:
-        for activity in activities:
-            f.write("%s\n" % activity)
+    return activity_json
+
+def get_activities_since_date(client, date):
+    activities = client.get_logged_in_athlete_activities(after=date)
+
+    activity_dict = {}
+
+    for activity in activities:
+        activity = activity.to_dict()
+        activity_dict[activity["id"]] = activity
+    
+    activity_json = json.dumps(activity_dict, indent=4, sort_keys=True, default=str)
+
+    return activity_json
+
+    file_activities = open("activities.json", "w")
+    file_activities.write(activity_json)
+    file_activities.close()
 
 
 def get_token():
