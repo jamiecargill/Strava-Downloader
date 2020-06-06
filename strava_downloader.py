@@ -1,28 +1,20 @@
 import os
 import dotenv
+import re
 import json
 import time
 from stravaio import strava_oauth2, StravaIO
 
-def everything_else(token, date = None):
+def everything_else(token):
     client = StravaIO(access_token=token['access_token'])
 
-    if date == None:
-        activities = client.get_logged_in_athlete_activities()
-    else:
-        activities = client.get_logged_in_athlete_activities(after=date)
+    #athlete = client.get_logged_in_athlete()
 
-    activity_dict = {}
+    activities = client.get_logged_in_athlete_activities(after='last week')
 
-    for activity in activities:
-        activity = activity.to_dict()
-        activity_dict[activity["id"]] = activity
-    
-    activity_json = json.dumps(activity_dict, indent=4, sort_keys=True, default=str)
-
-    file_activities = open("activities.json", "w")
-    file_activities.write(activity_json)
-    file_activities.close()
+    with open('activities.txt', 'w') as f:
+        for activity in activities:
+            f.write("%s\n" % activity)
 
 
 def get_token():
@@ -59,13 +51,70 @@ def get_new_token():
     return token
 
 
-def main():
-    dotenv.load_dotenv()
-    token = get_token()
+def set_dotenv(variable, value):
+    file_dotenv = open(".env", "r")
+    envvars = file_dotenv.readlines()
+    file_dotenv.close()
 
-    if token is not None:
-        everything_else(token, "2020-05-31")
-        return
+    match = None
+
+    for var in envvars:
+        if re.search(variable + "*", var):
+            match = var
+    
+    if match:
+        envvars.remove(match)
+
+    envvars.append(variable + '="' + value + '"\n')
+
+    file_dotenv = open(".env", "w")
+    file_dotenv.writelines(envvars)
+    file_dotenv.close()
+
+
+def check_dotenv(variable):
+    file_dotenv = open(".env", "r")
+    envvars = file_dotenv.readlines()
+    file_dotenv.close()
+
+    for var in envvars:
+        if re.search(variable + "*", var):
+            return True
+
+    return False
+
+
+def setup_dotenv():
+    # If .env does not exist, create it
+    if not os.path.exists(".env"):
+        file_dotenv = open(".env", "w")
+        file_dotenv.close()
+
+    # If client ID does not exist, set it
+    if not check_dotenv("STRAVA_CLIENT_ID"):
+        print('Enter your Strava Client ID:')
+        client_id = input()
+        set_dotenv("STRAVA_CLIENT_ID", client_id)
+
+    # If client secret does not exist, set it
+    if not check_dotenv("STRAVA_CLIENT_SECRET"):
+        print('Enter your Strava Client Secret:')
+        client_secret = input()
+        set_dotenv("STRAVA_CLIENT_SECRET", client_secret)
+
+
+def main():
+    setup_dotenv()
+    dotenv.load_dotenv()
+    STRAVA_CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
+    STRAVA_CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
+    #token = get_token()
+    #client = StravaIO(access_token=token['access_token'])
+    #get_most_recent_local_activity()
+
+    #if token is not None:
+    #    everything_else(client, "2020-05-31")
+    #    return
 
 
 if __name__ == "__main__":
