@@ -10,6 +10,7 @@ def write_activities_to_file(activity_json):
     file_activities.write(activity_json)
     file_activities.close()
 
+
 def get_activities(client, date = None):
     if date is None:
         activities = client.get_logged_in_athlete_activities()
@@ -30,8 +31,8 @@ def get_activities(client, date = None):
 #WIP
 def get_most_recent_local_activity():
     file_activities = open("activities.json", "r")
-    file_activities_contents = file_activities.read()
-    activities = json.loads(file_activities_contents)
+    #file_activities_contents = file_activities.read()
+    #activities = json.loads(file_activities_contents)
     file_activities.close()
 
 
@@ -48,6 +49,12 @@ def get_token():
 
 
 def get_local_token():
+    # If token.json does not exist, create it
+    if not os.path.exists("token.json"):
+        file_token = open("token.json", "w")
+        file_token.write({"expires_at": 0})
+        file_token.close()
+    
     file_token = open("token.json", "r")
     file_contents = file_token.read()
     token = json.loads(file_contents)
