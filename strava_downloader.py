@@ -61,11 +61,9 @@ def get_local_token():
     file_token.close()
     return token
 
-def get_new_token():
-    STRAVA_CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
-    STRAVA_CLIENT_SECRET = os.getenv("STRAVA_CLIENT_SECRET")
 
-    token = strava_oauth2(client_id=STRAVA_CLIENT_ID, client_secret=STRAVA_CLIENT_SECRET)
+def get_new_token():
+    token = strava_oauth2()
     token = json.dumps(token)
 
     file_token = open("token.json", "w")
@@ -137,7 +135,7 @@ def main():
     client = StravaIO(access_token=token['access_token'])
 
     # Get all activities and write to file
-    activity_json = get_activities(client)
+    activity_json = get_activities(client, "2020-06-06")
     write_activities_to_file(activity_json)
 
 
