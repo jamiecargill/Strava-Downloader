@@ -28,12 +28,20 @@ def get_activities(client, date = None):
     return activity_json
 
 
-#WIP
 def get_most_recent_local_activity():
     file_activities = open("activities.json", "r")
-    #file_activities_contents = file_activities.read()
-    #activities = json.loads(file_activities_contents)
+    file_activities_contents = file_activities.read()
     file_activities.close()
+
+    activities = json.loads(file_activities_contents)
+
+    last_activity_date = "1970-01-01 00:00:00+00:00"
+
+    for activity in activities.values():
+        if activity["start_date"] > last_activity_date:
+            last_activity_date = activity["start_date"]
+    
+    return last_activity_date
 
 
 def get_token():
@@ -131,12 +139,16 @@ def main():
     dotenv.load_dotenv()
 
     # Get token
-    token = get_token()
-    client = StravaIO(access_token=token['access_token'])
+    ##token = get_token()
+    ##client = StravaIO(access_token=token['access_token'])
+
+    # Get the date of the last locally-stored activity
+    last_activity_date = get_most_recent_local_activity()
+    print(last_activity_date)
 
     # Get all activities and write to file
-    activity_json = get_activities(client, "2020-06-06")
-    write_activities_to_file(activity_json)
+    ##activity_json = get_activities(client, "2020-06-06")
+    ##write_activities_to_file(activity_json)
 
 
 if __name__ == "__main__":
