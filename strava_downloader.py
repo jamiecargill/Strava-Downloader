@@ -2,7 +2,7 @@ import os
 import dotenv
 import re
 import json
-import time
+import datetime
 from stravaio import strava_oauth2, StravaIO
 
 def write_activities_to_file(activity_json):
@@ -29,6 +29,9 @@ def get_activities(client, date = None):
 
 
 def get_most_recent_local_activity():
+    if not os.path.exists("activities.json"):
+        return None
+    
     file_activities = open("activities.json", "r")
     file_activities_contents = file_activities.read()
     file_activities.close()
@@ -47,9 +50,10 @@ def get_most_recent_local_activity():
 def get_token():
     # Get locally stored token
     token = get_local_token()
+    current_time=datetime.datetime.now()
 
     # If token has expired, get new token
-    if int(time.time()) > token["expires_at"]:
+    if int(current_time.timestamp()) > token["expires_at"]:
         get_new_token()
         token = get_local_token()
     
@@ -145,6 +149,10 @@ def main():
     # Get the date of the last locally-stored activity
     last_activity_date = get_most_recent_local_activity()
     print(last_activity_date)
+
+
+
+
 
     # Get all activities and write to file
     ##activity_json = get_activities(client, "2020-06-06")
