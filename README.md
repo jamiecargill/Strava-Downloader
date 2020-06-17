@@ -2,7 +2,7 @@
 
 This script downloads all of your Strava activities to a JSON file. Running it again will fetch any recent activities and append them to the file.
 
-The response will contain the standard response from the [Strava API](https://developers.strava.com/docs/reference/#api-Activities-getActivityById) as the value, and the activity ID as the key, like so:
+The output will contain the standard response from the [Strava API](https://developers.strava.com/docs/reference/#api-Activities-getActivityById) as the value, and the activity ID as the key, like so:
 
 ```json
 "0123454321": {
