@@ -7,19 +7,24 @@ from stravaio import strava_oauth2, StravaIO
 
 
 def write_activities_to_file(activity_dict):
-    # Open/Create file and load contents into dict
-    file_activities = open("activities.json", "r")
-    file_activities_contents = file_activities.read()
-    file_activities.close()
-    activities = json.loads(file_activities_contents)
+    # If activities.json exists and is not empty
+    if os.path.exists("activities.json") and os.stat("activities.json").st_size != 0:
+        # Open file and load contents into dict
+        file_activities = open("activities.json", "r")
+        file_activities_contents = file_activities.read()
+        file_activities.close()
+        activities = json.loads(file_activities_contents)
 
-    # For each new activity passed in, append to the existing activity dict IF it doesn't already exist
-    for activity in activity_dict:
-        if str(activity) not in activities:
-            activities[str(activity)] = activity_dict[activity]
+        # For each new activity passed in, append to the existing activity dict IF it doesn't already exist
+        for activity in activity_dict:
+            if str(activity) not in activities:
+                activities[str(activity)] = activity_dict[activity]
+
+        activity_json = json.dumps(activities, indent=4, sort_keys=True, default=str)
+    else:
+        activity_json = json.dumps(activity_dict, indent=4, sort_keys=True, default=str)
 
     # Write new json to file and close
-    activity_json = json.dumps(activities, indent=4, sort_keys=True, default=str)
     file_activities = open("activities.json", "w")
     file_activities.write(activity_json)
     file_activities.close()
@@ -48,7 +53,11 @@ def get_most_recent_local_activity():
     file_activities_contents = file_activities.read()
     file_activities.close()
 
-    activities = json.loads(file_activities_contents)
+    try:
+        activities = json.loads(file_activities_contents)
+    except json.decoder.JSONDecodeError:
+        # File empty
+        return None
 
     last_activity_date = "1970-01-01 00:00:00+00:00"
 
