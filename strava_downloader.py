@@ -5,7 +5,21 @@ import json
 import datetime
 from stravaio import strava_oauth2, StravaIO
 
-def write_activities_to_file(activity_json):
+
+def write_activities_to_file(activity_dict):
+    # Open/Create file and load contents into dict
+    file_activities = open("activities.json", "r")
+    file_activities_contents = file_activities.read()
+    file_activities.close()
+    activities = json.loads(file_activities_contents)
+
+    # For each new activity passed in, append to the existing activity dict IF it doesn't already exist
+    for activity in activity_dict:
+        if str(activity) not in activities:
+            activities[str(activity)] = activity_dict[activity]
+
+    # Write new json to file and close
+    activity_json = json.dumps(activities, indent=4, sort_keys=True, default=str)
     file_activities = open("activities.json", "w")
     file_activities.write(activity_json)
     file_activities.close()
@@ -22,10 +36,8 @@ def get_activities(client, date = None):
     for activity in activities:
         activity = activity.to_dict()
         activity_dict[activity["id"]] = activity
-    
-    activity_json = json.dumps(activity_dict, indent=4, sort_keys=True, default=str)
 
-    return activity_json
+    return activity_dict
 
 
 def get_most_recent_local_activity():
@@ -44,6 +56,8 @@ def get_most_recent_local_activity():
         if activity["start_date"] > last_activity_date:
             last_activity_date = activity["start_date"]
     
+    last_activity_date = datetime.datetime.strptime(last_activity_date, '%Y-%m-%d %H:%M:%S%z')
+
     return last_activity_date
 
 
@@ -143,20 +157,21 @@ def main():
     dotenv.load_dotenv()
 
     # Get token
-    ##token = get_token()
-    ##client = StravaIO(access_token=token['access_token'])
+    token = get_token()
+    client = StravaIO(access_token=token['access_token'])
 
-    # Get the date of the last locally-stored activity
+    # Get the last locally-stored activity
     last_activity_date = get_most_recent_local_activity()
-    print(last_activity_date)
 
-
-
-
+    # Get the date seven days prior, in case any activities were uploaded late
+    if last_activity_date is None:
+        date_to_get = None
+    else:
+        date_to_get = last_activity_date - datetime.timedelta(days=7)
 
     # Get all activities and write to file
-    ##activity_json = get_activities(client, "2020-06-06")
-    ##write_activities_to_file(activity_json)
+    activity_dict = get_activities(client, date_to_get)
+    write_activities_to_file(activity_dict)
 
 
 if __name__ == "__main__":
