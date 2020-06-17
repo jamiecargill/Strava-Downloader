@@ -20,9 +20,9 @@ def write_activities_to_file(activity_dict):
             if str(activity) not in activities:
                 activities[str(activity)] = activity_dict[activity]
 
-        activity_json = json.dumps(activities, indent=4, sort_keys=True, default=str)
+        activity_json = json.dumps(activities, indent=4, default=str)
     else:
-        activity_json = json.dumps(activity_dict, indent=4, sort_keys=True, default=str)
+        activity_json = json.dumps(activity_dict, indent=4, default=str)
 
     # Write new json to file and close
     file_activities = open("activities.json", "w")
